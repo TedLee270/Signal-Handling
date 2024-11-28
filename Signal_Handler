@@ -11,7 +11,7 @@ volatile sig_atomic_t sigint_count = 0;
 
 // Signal handler for SIGINT (Ctrl+C)
 void sigint_handler(int sigint) {
-  printf("Received signal (SIGINT)...\n");
+  printf("\nReceived signal (SIGINT)...\n");
   sigint_count++;
   printf("Number of SIGINT caught: %d\n", sigint_count);
 }
@@ -33,7 +33,7 @@ int main() {
   // Block the SIGUSR1 signal 
   sigemptyset(&block_mask);
   sigaddset(&block_mask, SIGUSR1);
-  if(sigprocmask(SIG_BLOCK, &sigset, NULL) == -1) {
+  if(sigprocmask(SIG_BLOCK, &block_mask, NULL) == -1) {
     perror("sigprocmask");
     return -1;
   }
@@ -98,7 +98,7 @@ int main() {
     exit(EXIT_FAILURE);
   }
   else {
-    printf("SIGUSR2 restored...\n");
+    printf("Old mask restored...\n");
   }
 
   printf("SIGUSR2 received, exiting...\n");
