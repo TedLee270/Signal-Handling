@@ -7,32 +7,79 @@
 volatile sig_atomic_t sigusr2_received = 0;
 
 // Signal handler for SIGINT (Ctrl+C)
-<CODE>
+void sigint_handler(int sigint) {
+  printf("Received signal (SIGINT) - exiting...\n");
+  exit(0);
+}
 
 // Signal handler for SIGUSR2
-<CODE>
+void sigusr2_handler(int sigusr2) {
+  printf("Received signal (SIGUSR2) - exiting...\n");
+  sigusr2_received = 1;
+  printf("SIGUSR2 caught, flag set...\n");
+}
 
 int main() {
-    // Print process id (PID)                         (1pt)
-<CODE>
+  struct sigaction sigact;
+  sigset_t sigset, block_mask, old_mask, suspend_mask;
+  // Print process id (PID)  
+  printf("Printing PID: %d\n", getpid());
 
-    // Block the SIGUSR1 signal                            (1pt) 
-<CODE>
+  // Block the SIGUSR1 signal 
+  sigemptyset(&sigset);
+  sigaddset(&sigset, SIGUSR1);
+  if(sigprocmask(SIG_BLOCK, &sigset, NULL) == -1) {
+    perror("sigprocmask");
+    return -1;
+  }
 
-    // Set up the SIGINT (Ctrl+C) signal handler         (3pt)
-<CODE>
+  // Set up the SIGINT (Ctrl+C) signal handler 
+  sigact.sa_handler = sigint_handler;
+  sigact.sa_flags = 0;
+  sigemptyset(&sigact.sa_mask);
+  
+  if(sigaction(SIGINT, &sigact, NULL) == -1) {
+    perror("sigaction");
+    exit(EXIT_FAILURE);
+  }
 
-    printf("Program starts waiting for SIGUSR2...\n");   //  (5pt)
-                 
-    // Set up the SIGUSR2 signal handler and 
-    // Check flag in a while loop using sigsuspend , but make sure you will not
-    // miss the signal (so, block SIGUSR2 before while loop (use the robust version from the slides), 
-    // then check cond and use sigsuspend)
-<CODE>
-    printf("Got SIGUSR2, terminating the program.\n");
+  printf("Program starts waiting for SIGUSR2...\n");   
 
-    // Restore the oldmask which was obtained when blocking SIGUSR2
-<CODE>
+  // Set up the SIGUSR2 signal handler and 
+  // Check flag in a while loop using sigsuspend , but make sure you will not
+  // miss the signal (so, block SIGUSR2 before while loop (use the robust version from the slides), 
+  // then check cond and use sigsuspend)
+  sigact.sa_handler = sigusr2_handler;
+  sigact.sa_flags = 0;
+  sigemptyset(&sigact.sa_mask);
+  if(sigaction(SIGUSR2, &sigact, NULL) == -1) {
+    perror("sigaction");
+    exit(EXIT_FAILURE);
+  }
 
-    return 0;
+  //Block SIGUSR2
+  sigemptyset(&sigset);
+  sigaddset(&sigset, SIGUSR2);
+  if(sigprocmask(SIG_BLOCK, &block_mask, &old_mask) == -1) {
+    perror("sigprocmask");
+    exit(EXIT_FAILURE);
+  }
+  
+  printf("Got SIGUSR2, terminating the program.\n");
+
+  sigemptyset(&suspend_mask);
+  while(!sigusr2_received) {
+    printf("Waiting for SIGUSR2...\n");
+    sigsuspend(&suspend_mask);
+  }
+
+  // Restore the oldmask which was obtained when blocking SIGUSR2
+  if(sigprocmask(SIG_SETMASK, &old_mask, NULL) == -1) {
+    perror("sigprocmask");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("SIGUSR2 received, exiting...\n");
+
+  return 0;
 }
