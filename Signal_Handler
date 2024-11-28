@@ -6,10 +6,14 @@
 // Flag to indicate if SIGUSR2 has been received
 volatile sig_atomic_t sigusr2_received = 0;
 
+// Number of signals caught for SIGINT
+volatile sig_atomic_t sigint_count = 0;
+
 // Signal handler for SIGINT (Ctrl+C)
 void sigint_handler(int sigint) {
   printf("Received signal (SIGINT)...\n");
-  exit(0);
+  sigint_count++;
+  printf("Number of SIGINT caught: %d\n", sigint_count);
 }
 
 // Signal handler for SIGUSR2
