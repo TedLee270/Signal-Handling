@@ -31,8 +31,8 @@ int main() {
   printf("Printing PID: %d\n", getpid());
 
   // Block the SIGUSR1 signal 
-  sigemptyset(&sigset);
-  sigaddset(&sigset, SIGUSR1);
+  sigemptyset(&block_mask);
+  sigaddset(&block_mask, SIGUSR1);
   if(sigprocmask(SIG_BLOCK, &sigset, NULL) == -1) {
     perror("sigprocmask");
     return -1;
