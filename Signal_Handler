@@ -71,8 +71,8 @@ int main() {
   }
 
   //Block SIGUSR2
-  sigemptyset(&sigset);
-  sigaddset(&sigset, SIGUSR2);
+  sigemptyset(&block_mask);
+  sigaddset(&block_mask, SIGUSR2);
   if(sigprocmask(SIG_BLOCK, &block_mask, &old_mask) == -1) {
     perror("sigprocmask");
     exit(EXIT_FAILURE);
