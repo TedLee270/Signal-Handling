@@ -84,7 +84,6 @@ int main() {
   printf("Got SIGUSR2, terminating the program.\n");
 
   sigemptyset(&suspend_mask);
-  sigaddset(&suspend_mask, SIGUSR2);
   sigprocmask(SIG_BLOCK, &suspend_mask, NULL);
   
   while(!sigusr2_received) {
