@@ -16,6 +16,11 @@ void sigint_handler(int sigint) {
   printf("Number of SIGINT caught: %d\n", sigint_count);
 }
 
+// Signal handler for SIGUSR1
+void sigusr1_handler(int sigusr1) {
+  printf("\nReceived signal (SIGUSR1)...\n");
+}
+
 // Signal handler for SIGUSR2
 void sigusr2_handler(int sigusr2) {
   printf("Received signal (SIGUSR2) - exiting...\n");
@@ -24,9 +29,9 @@ void sigusr2_handler(int sigusr2) {
 }
 
 int main() {
-  //Variables set
+  // Variables set
   struct sigaction sigact;
-  sigset_t sigset, block_mask, old_mask, suspend_mask;
+  sigset_t block_mask, old_mask, suspend_mask;
   // Print process id (PID)  
   printf("Printing PID: %d\n", getpid());
 
@@ -53,6 +58,16 @@ int main() {
     printf("SIGINT handler set...\n");
   }
 
+  // Set up the SIGUSR1 signal handler
+  sigact.sa_handler = sigusr1_handler;
+  if(sigaction(SIGUSR1, &sigact, NULL) == -1) {
+    perror("sigaction");
+    exit(EXIT_FAILURE);
+  }
+  else {
+    printf("SIGUSR1 handler set...\n");
+  }
+
   printf("Program starts waiting for SIGUSR2...\n");   
 
   // Set up the SIGUSR2 signal handler and 
@@ -70,7 +85,7 @@ int main() {
     printf("SIGUSR2 handler set...\n");
   }
 
-  //Block SIGUSR2
+  // Block SIGUSR2
   sigemptyset(&block_mask);
   sigaddset(&block_mask, SIGUSR2);
   if(sigprocmask(SIG_BLOCK, &block_mask, &old_mask) == -1) {
