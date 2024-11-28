@@ -10,14 +10,14 @@ Then you can test it by pressing Ctrl-C on the same terminal and/or executing th
 
 kill -SIGINT 12040 
 
-# main program terminal shows a message about SIGINT and the number of occurrences 
+// main program terminal shows a message about SIGINT and the number of occurrences 
 
 kill -SIGUSR1 12040
 
-# main program terminal will show nothing because it blocked this signal 
+// main program terminal will show nothing because it blocked this signal 
 
 kill -SIGUSR2 12040
 
-# main program terminal shows a message and terminates the program
+// main program terminal shows a message and terminates the program
 
 These were the commands given in order to test and run the program in order to ensure that the program worked as instructed.
